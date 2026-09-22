@@ -1,0 +1,183 @@
+/* =========================================================================
+   TRAZO CLÍNICA — estimador d'empelts (adaptat de la calculadora de referència)
+   Una pregunta per pantalla, opcions grans i tàctils. Tokens de styles.css.
+   ========================================================================= */
+
+.calc { min-height: calc(100svh - var(--cap-h)); padding-block: clamp(1.5rem, 1rem + 3vw, 3.5rem) 4rem; }
+/* El JS amaga passos i grups de trams amb l'atribut hidden; sense aquesta regla
+   el display:grid de .calc-ops el guanya i surten els trams de tots els tipus. */
+.calc [hidden] { display: none !important; }
+.calc-in { max-width: 60rem; }
+
+/* Capçalera: enrere · línia de progrés (una cota que s'omple) · comptador */
+.calc-cap { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1rem; min-height: 2.75rem; }
+.calc-enrere {
+  display: inline-flex; align-items: center; gap: .3rem; padding: .5rem .6rem .5rem .2rem;
+  background: none; border: 0; cursor: pointer; font: 600 1rem/1 var(--f-cos); color: var(--tinta);
+}
+.calc-enrere svg { width: 1.2rem; height: 1.2rem; }
+.calc-enrere:hover { color: var(--genciana); }
+.calc-enrere[hidden] { display: inline-flex !important; visibility: hidden; }
+.calc-progres { position: relative; height: 2px; background: var(--acero); }
+.calc-progres::before, .calc-progres::after {
+  content: ""; position: absolute; top: -6px; width: 2px; height: 14px; background: var(--grafito);
+}
+.calc-progres::before { left: 0; }
+.calc-progres::after { right: 0; }
+.calc-progres i {
+  position: absolute; inset: 0; background: var(--genciana); height: 4px; top: -1px;
+  transform-origin: left; transform: scaleX(0); transition: transform .45s cubic-bezier(.2,.7,.2,1);
+}
+.calc-comptador { font: 600 var(--t-s)/1 var(--f-cos); color: var(--grafito); font-variant-numeric: tabular-nums; min-width: 2.5rem; text-align: right; }
+
+/* Respostes ja donades: xips que tornen enrere */
+.calc-resum { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0 0; min-height: 2rem; }
+.calc-resum button {
+  font: 500 var(--t-s)/1 var(--f-cos); padding: .45rem .7rem; border-radius: 999px;
+  background: var(--piel); border: 1px solid transparent; color: var(--tinta); cursor: pointer;
+}
+.calc-resum button:hover { border-color: var(--genciana); color: var(--genciana); }
+
+/* Pas */
+.calc-pas { margin-top: clamp(1.5rem, 1rem + 2vw, 3rem); }
+.calc-pas h1, .calc-pas h2 { font-size: var(--t-xl); max-width: 20ch; outline: none; }
+.calc-intro { font: 600 1.05rem/1.3 var(--f-cos); color: var(--genciana); margin-bottom: .75rem; outline: none; }
+.calc-ajuda { margin-top: .75rem; color: var(--grafito); max-width: 40rem; }
+
+.entra { animation: calc-entra .38s cubic-bezier(.2,.7,.2,1); }
+.entra-enrere { animation: calc-entra-enrere .38s cubic-bezier(.2,.7,.2,1); }
+@keyframes calc-entra { from { opacity: 0; transform: translateX(32px); } }
+@keyframes calc-entra-enrere { from { opacity: 0; transform: translateX(-32px); } }
+
+/* Opcions */
+.calc-ops { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .9rem; margin-top: 2rem; }
+.calc-ops-dues { grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+.calc-op {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: .35rem;
+  min-height: 4.25rem; padding: 1.1rem 1.25rem; text-align: left; cursor: pointer;
+  background: var(--blanc); color: var(--tinta); border: 1.5px solid var(--acero); border-radius: var(--radi);
+  transition: border-color .15s, transform .15s, box-shadow .15s, background-color .15s;
+}
+.calc-op:hover { border-color: var(--tinta); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(33, 30, 39,.08); }
+.calc-op:active { transform: translateY(0); }
+.calc-op-nom { font: 700 1.25rem/1.2 var(--f-cos); letter-spacing: -.01em; }
+.calc-op-desc { font-size: 1rem; line-height: 1.45; color: var(--grafito); }
+.calc-op[aria-pressed="true"] { border-color: var(--genciana); background: var(--genciana); color: var(--blanc); }
+.calc-op[aria-pressed="true"] .calc-op-desc { color: var(--genciana-clar); }
+.calc-op::after {
+  content: ""; position: absolute; top: .9rem; right: .9rem; width: 1.25rem; height: 1.25rem; border-radius: 50%;
+  border: 1.5px solid var(--acero); background: var(--blanc);
+}
+.calc-op[aria-pressed="true"]::after {
+  border-color: var(--blanc);
+  background: var(--blanc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12l4 4 8-8' fill='none' stroke='%235B2B84' stroke-width='3'/%3E%3C/svg%3E") center / .9rem no-repeat;
+}
+.calc-ops-foto .calc-op { padding: 0 0 1.1rem; overflow: hidden; }
+.calc-ops-foto .calc-op img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; margin-bottom: .6rem; transition: transform .4s ease; }
+.calc-ops-foto .calc-op:hover img { transform: scale(1.03); }
+.calc-ops-foto .calc-op-nom, .calc-ops-foto .calc-op-desc { padding-inline: 1.1rem; }
+.calc-ops-foto .calc-op::after { top: .75rem; right: .75rem; }
+
+/* Formularis de correu i codi */
+.calc-form { margin-top: 2rem; max-width: 36rem; }
+.calc-form label { display: block; font: 600 1rem/1.3 var(--f-cos); margin-bottom: .45rem; }
+.calc-fila { display: flex; flex-wrap: wrap; gap: .6rem; }
+.calc-fila input {
+  flex: 1 1 16rem; min-height: 3.25rem; padding: .75rem .9rem; font-size: 1.125rem;
+  border: 1.5px solid #8E8993; border-radius: var(--radi); background: var(--blanc);
+}
+.calc-fila input:focus-visible { outline-offset: 0; border-color: var(--genciana); }
+.calc-fila input[aria-invalid="true"] { border-color: var(--error); }
+.calc-fila .btn { min-height: 3.25rem; flex: 0 0 auto; }
+.calc-captcha { margin-top: .9rem; min-height: 0; }
+.calc-error { margin-top: .75rem; color: var(--error); font-weight: 600; min-height: 1.5em; }
+.calc-legal { font-size: var(--t-s); color: var(--grafito); }
+
+.calc-codi { display: flex; gap: .5rem; border: 0; margin: 0; padding: 0; }
+.calc-codi input {
+  width: 3.25rem; height: 4rem; text-align: center; font: 700 1.75rem/1 var(--f-cos);
+  border: 1.5px solid #8E8993; border-radius: var(--radi); background: var(--blanc);
+  font-variant-numeric: tabular-nums;
+}
+.calc-codi input:focus-visible { outline-offset: 0; border-color: var(--genciana); }
+@media (max-width: 400px) { .calc-codi { gap: .35rem; } .calc-codi input { width: 2.7rem; height: 3.5rem; font-size: 1.5rem; } }
+
+.calc-accions { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin-top: 1.25rem; }
+.calc-enllac {
+  background: none; border: 0; padding: .4rem 0; cursor: pointer;
+  font: 600 1rem/1.3 var(--f-cos); color: var(--genciana); text-decoration: underline; text-decoration-thickness: 1.5px;
+}
+.calc-enllac:disabled { color: var(--grafito); cursor: default; text-decoration: none; }
+
+/* Resultat */
+.calc-resultat { max-width: 58rem; }
+.calc-preu {
+  font: 700 clamp(2.4rem, 1.2rem + 5vw, 4.5rem)/1 var(--f-cos); letter-spacing: -.03em;
+  color: var(--tinta); font-variant-numeric: tabular-nums; outline: none;
+}
+.calc-resultat-resum { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1.5rem 0 2rem; }
+.calc-resultat-resum li { font: 500 var(--t-s)/1 var(--f-cos); padding: .5rem .75rem; border-radius: 999px; background: var(--piel); }
+.calc-wa { background: var(--whatsapp); color: var(--blanc); min-height: 3.75rem; padding-inline: 1.6rem; font-size: 1.15rem; }
+.calc-wa:hover { background: var(--whatsapp-fosc); }
+.calc-wa svg { width: 1.5rem; height: 1.5rem; }
+
+.peu-mini { padding-block: 1.25rem; }
+.peu-mini .peu-baix { margin-top: 0; padding-top: 0; border-top: 0; }
+
+
+
+/* Mòbil: totes les opcions han de cabre sense fer scroll (mínim de gestos).
+   Les opcions amb foto passen a files amb miniatura a l'esquerra. */
+@media (max-width: 560px) {
+  .calc { padding-block: 1rem 3rem; }
+  .calc-pas { margin-top: 1.25rem; }
+  .calc-pas h1, .calc-pas h2 { font-size: clamp(1.7rem, 1.2rem + 3vw, 2.1rem); }
+  .calc-intro { font-size: .95rem; margin-bottom: .5rem; }
+  .calc-resum { margin-top: .6rem; min-height: 0; }
+  .calc-ops, .calc-ops-dues, .calc-ops-foto { grid-template-columns: 1fr; gap: .6rem; margin-top: 1.25rem; }
+  .calc-op { min-height: 3.75rem; padding: .9rem 3rem .9rem 1rem; }
+  .calc-op-nom { font-size: 1.1rem; }
+  .calc-ops-foto .calc-op {
+    display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); grid-template-rows: auto auto;
+    column-gap: .9rem; align-items: center; align-content: center; padding: .5rem 3rem .5rem .5rem;
+  }
+  .calc-ops-foto .calc-op img {
+    grid-row: 1 / span 2; width: 5.5rem; height: 5.5rem; aspect-ratio: 1; margin: 0; border-radius: 4px;
+  }
+  .calc-ops-foto .calc-op-nom, .calc-ops-foto .calc-op-desc { padding-inline: 0; }
+  .calc-ops-foto .calc-op-desc { font-size: .9rem; }
+  /* Sense descripció, el nom es centra amb la miniatura. */
+  .calc-ops-foto .calc-op-nom:last-child { grid-row: 1 / span 2; }
+  .calc-ops-foto .calc-op::after, .calc-op::after { top: 50%; right: .9rem; margin-top: -.625rem; }
+  .calc-fila .btn { width: 100%; }
+}
+
+/* Opcions amb el dibuix del cap (pas 2) */
+.calc-ops-patro { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 44rem; }
+@media (min-width: 900px) { .calc-ops-patro[data-grup="hombre"] { grid-template-columns: repeat(6, minmax(0, 1fr)); max-width: none; } }
+.calc-ops-patro .calc-op { align-items: center; text-align: center; padding: 1rem .75rem 1rem; gap: .6rem; }
+.calc-ops-patro .cap-dibuix { width: 100%; max-width: 7rem; }
+.calc-ops-patro .calc-op-nom { font-size: 1.05rem; }
+.calc-ops-patro .calc-op[aria-pressed="true"] { background: var(--piel); color: var(--tinta); }
+.calc-ops-patro .calc-op[aria-pressed="true"] .cap-dibuix .d-contorn { stroke: var(--tinta); }
+
+/* Resultat: dues xifres (UF i preu) */
+.calc-xifres { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 2.5rem; margin-top: .5rem; }
+.calc-etiqueta { font-size: var(--t-s); color: var(--grafito); font-weight: 500; }
+.calc-uf { font: 400 clamp(2rem, 1.2rem + 2.4vw, 3rem)/1.05 var(--f-titol); font-variant-numeric: tabular-nums; margin-top: .35rem; }
+.calc-preu { font-family: var(--f-titol); font-weight: 400; font-size: clamp(2rem, 1.2rem + 2.4vw, 3rem); line-height: 1.05; margin-top: .35rem; color: var(--genciana); letter-spacing: -.01em; }
+.calc-sessions { font-size: var(--t-s); color: var(--grafito); margin-top: .4rem; }
+.calc-avisos .avis { margin-top: 1rem; }
+@media (max-width: 560px) {
+  .calc-xifres { grid-template-columns: 1fr; gap: 1.25rem; }
+  .calc-ops-patro { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .calc-ops-patro .calc-op { display: flex; padding: .75rem .5rem; min-height: 0; }
+  .calc-ops-patro .cap-dibuix { max-width: 4.6rem; }
+  .calc-ops-patro .calc-op::after { top: .6rem; right: .6rem; margin-top: 0; }
+}
+
+/* Consentiment explicit (dades de salut) */
+.calc-form .calc-consent { display: flex; gap: .7rem; align-items: flex-start; margin-top: 1rem; font: 400 1rem/1.45 var(--f-cos); cursor: pointer; }
+.calc-form .calc-consent input { flex: none; width: 1.3rem; height: 1.3rem; margin-top: .1rem; accent-color: var(--genciana); }
+@media (min-width: 561px) { .calc-uf, .calc-preu { white-space: nowrap; } }
+.calc { overflow-x: clip; } /* la transicio de pas (translateX) no pot crear scroll horitzontal */
