@@ -544,3 +544,7 @@ strong { font-weight: 600; }
 @media (max-width: 359px) {
   .marca > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+/* Peu amb el crèdit «Demo de Ductik» (12/10/2026): marge a sota perquè, en arribar
+   al final, el botó flotant de WhatsApp no tapi l'última línia del peu. */
+body:has(.wa-flota) .peu { padding-bottom: 5.5rem; }
